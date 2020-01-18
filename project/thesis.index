@@ -77,8 +77,9 @@
 				<li><strong>Description</strong> : </li>
 				<div style="padding-left: 30px;">
 					<ul type="circle">
-					<li><strong>Real boxes</strong> : A group of tote images photoed by SR300 from real world with different view angles and distances</li>
-					<li><strong>Unity boxes</strong> : A group of tote images generated from virtual environment (Unity) with different view angles and distances</li>
+					<li><strong>Real totes</strong> : A group of tote images photoed by SR300 from real world with different view angles and distances</li>
+					<li><strong>Unity totes</strong> : A group of tote images generated from virtual environment (Unity) with different view angles and distances</li>
+					<li><strong>Objects</strong> : Unity tote images with object inside. Every image has a corresponding labeled mask</li>
 				</div>
 			</ul>
 			<table class="table table-bordered table-hover table-condensed" style="width: 100%">
@@ -93,7 +94,7 @@
 						<td>Tote Sim2Real Dataset</td>
 						<td>5690 images</td>
 						<td>38483 images</td>
-						<td><a href="https://drive.google.com/open?id=1mR7ZMujgDS8iIypru7FHU1qEapluUkfL">real_data.zip</a></td>
+						<td><a href="https://drive.google.com/open?id=1mR7ZMujgDS8iIypru7FHU1qEapluUkfL">tote_sim2real.zip</a></td>
 					</tr>
 				</tbody>
 			</table>
