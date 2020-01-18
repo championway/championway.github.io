@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<meta name="description" content="description"/>
+<meta name="keywords" content="keywords"/> 
+<meta name="author" content="author"/> 
+<link rel="stylesheet" type="text/css" href="../css/arg.css" media="screen"/>
+<title>Nick Wang at NCTU</title>
+</head>
+
+<body>
+
+<div class="outer-container">
+
+<div class="inner-container">
+
+	<div class="header">
+		
+		<div class="title">
+			<span class="sitename"><a href="../index.html">Assistive Robotics Group</a>&nbsp;&nbsp;&nbsp;<a href="index_ch.html">機器人與輔助科技實驗室</a></span>
+		</div>
+
+	</div>
+
+	<div class="path">
+
+		<a href="../index.html">Home</a> 
+		<a href="../event.html">News</a> 
+		<a href="../people.html">People</a> 
+		<a href="../robots.html">Robots</a> 
+		<a href="../research.html">Research</a> 
+		<a href="../publications.html">Publications</a>
+		<a href="../courses.html">Courses</a>
+		<a href="../materials.html">Materials</a>
+	</div>
+
+	<div class="blank">
+		<h0>Generative Adversarial Networks for Real-robot Missions</h0>
+		<p></p>
+
+        <h1>Author</h1>
+        <p>
+        	<a href="https://championway.github.io" style="color:black; text-decoration:none;">Pin-Wei "David" Chen</a><br>
+        	<a href = "mailto: ccpwearth@gmail.com">ccpwearth@gmail.com</a>
+        </p>
+
+		<h1>Abstract</h1>
+		<p>
+			Leveraging highly developed deep learning and artificial intelligence, computer vision technology and applications reached new levels. Computers can now not only perform image processing, classification, and object detection, but also can ”create” images similarly to humans, due to generative model developments. In particular, the generative adversarial network (GAN) provides many architectures and applications, such as image style transfer, human face generation, image generation from text, etc. However, there has been little study regarding applying GAN to real-robot missions to replace and improve other approaches. Therefore, this work proposed two GANs: FCN-Pix2Pix and SSIM-CycleGAN, based on Pix2Pix and CycleGAN respectively, and implemented them for two real-robot missions which still face some challenges with modern solutions: semantic segmentation and virtual dataset from sim to real. The proposed approaches were also compared with current state-of-the-art approaches, verifying significant advantages for the proposed methods.
+        </p>
+
+		<!-- <h1>Video</h1>
+		<div class="container" align="middle">
+		    <iframe src="https://www.youtube.com/embed/32skA6hZa_Q" width="560" height="315" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div> -->
+
+        <h1>Image</h1>
+        <h2>Network Architectures</h2>
+        <div class="container" align="middle">
+        	<img src="Image/fcn_gan.jpg" alt="fcn_gan" style="padding:5px;" width="350">
+        	<img src="Image/SSIM-CycleGAN.jpg" alt="SSIM-CycleGAN" style="padding:5px;" width="350">
+        </div>
+        <h2>Experiments</h2>
+        <div class="container" align="middle">
+        	<img src="Image/ex1.png" alt="ex1" style="padding:5px;" width="350">
+        	<img src="Image/ex2.png" alt="ex2" style="padding:5px;" width="350">
+        </div>
+
+        <h1>Tote Sim2Real Dataset</h1>
+        <div style="padding-left: 20px;">
+			<ul type="disc">
+				<li><strong>Class</strong> : 2</li>
+				<li><strong>Class list</strong> : Real totes, Unity totes</li>
+				<li><strong>Image size</strong> : 640*480</li>
+				<li><strong>Description</strong> : </li>
+				<div style="padding-left: 30px;">
+					<ul type="circle">
+					<li><strong>Real boxes</strong> : A group of tote images photoed by SR300 from real world with different view angles and distances</li>
+					<li><strong>Unity boxes</strong> : A group of tote images generated from virtual environment (Unity) with different view angles and distances</li>
+				</div>
+			</ul>
+			<table class="table table-bordered table-hover table-condensed" style="width: 100%">
+				<tbody>
+					<tr>
+						<td><b>Dataset</b></td>
+						<td><b>Real totes</b></td>
+						<td><b>Unity totes</b></td>
+						<td><b>Dataset(.tar)</b></td>
+					</tr>
+					<tr>
+						<td>Tote Sim2Real Dataset</td>
+						<td>5690 images</td>
+						<td>38483 images</td>
+						<td><a href="https://drive.google.com/open?id=1mR7ZMujgDS8iIypru7FHU1qEapluUkfL">real_data.zip</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h1>The Paper</h1>
+		<p>The project paper can be found <a href="https://arg-nctu.github.io/publications/text-pick-n-place-paper.pdf">here</a>.</p>
+
+        <!-- <div style='overflow-x:scroll;overflow-y:hidden;width:600px;height:250px'>
+			<h2>Bibtex</h2>
+			<pre><code>
+
+
+@article{Su-2019-IROS,
+	title={Pose-Aware Placement of Objects with Semantic Labels-Brandname-based Affordance Prediction and Cooperative Dual-Arm Active Manipulation},
+	author={Su, Yung-Shan and Lu, Shao-Huang and Ser, Po-Sheng and Hsu, Wei-Ting and Lai, Wei-Cheng and Xie, Biao and Huang, Hong-Ming and Lee, Teng-Yok and Chen, Hung-Wen and Yu, Lap-Fai and others},
+	year={2019}
+}
+            </code></pre>
+		</div> -->
+
+
+
+		<div class="clearer">&nbsp;</div>
+
+	</div>
+
+	<div class="footer">
+
+		<span class="left">
+			&copy; H.C. Wang
+		</span>
+
+		<span class="right"><a href="http://templates.arcsin.se/">Website template</a> by <a href="http://arcsin.se/">Arcsin</a></span>
+
+		<div class="clearer"></div>
+
+	</div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>
