@@ -75,12 +75,22 @@
 				<li><strong>Class</strong> : 2</li>
 				<li><strong>Class list</strong> : Real totes, Unity totes</li>
 				<li><strong>Image size</strong> : 640*480</li>
-				<li><strong>Description</strong> : </li>
+				<li><strong>Image Description</strong> : </li>
 				<div style="padding-left: 30px;">
 					<ul type="circle">
-					<li><strong>Real totes</strong> : A group of tote images photoed by SR300 from real world with different view angles and distances</li>
-					<li><strong>Unity totes</strong> : A group of tote images generated from virtual environment (Unity) with different view angles and distances</li>
-					<li><strong>Objects</strong> : Unity tote images with object inside. Every image has a corresponding labeled mask</li>
+					<li><strong>Real tote</strong> : A group of tote images photoed by SR300 from real world with different view angles and distances</li>
+					<li><strong>Unity tote</strong> : A group of tote images generated from virtual environment (Unity) with different view angles and distances</li>
+					<li><strong>Image</strong> : Unity tote images with objects inside. Every image has a corresponding labeled mask in mask folder</li>
+					<li><strong>Mask</strong> : Labeled masks from Unity RGB images</li>
+				</div>
+				<li><strong>CSV Description</strong> : </li>
+				<div style="padding-left: 30px;">
+					<ul type="circle">
+					<li><strong>menu.csv</strong> : It shows the mapping between Unity image (column 1), mask (column 2) and Unity tote image (column 3).</li>
+					<li><strong>real_totes_train.csv</strong> : A list of real totes image for training</li>
+					<li><strong>real_totes_test.csv</strong> : A list of real totes image for testing</li>
+					<li><strong>unity_totes_train.csv</strong> : A list of Unity totes image for training</li>
+					<li><strong>unity_totes_test.csv</strong> : A list of Unity totes image for testing</li>
 				</div>
 			</ul>
 			<table class="table table-bordered table-hover table-condensed" style="width: 100%">
@@ -88,16 +98,26 @@
 					<tr>
 						<td><b>Dataset</b></td>
 						<td><b>Size</b></td>
+						<td><b>Image</b></td>
 						<td><b>Real totes</b></td>
 						<td><b>Unity totes</b></td>
 						<td><b>Dataset(.tar)</b></td>
 					</tr>
 					<tr>
+						<td>Tote Sim2Real Sample</td>
+						<td>25.9MB</td>
+						<td>100 images</td>
+						<td>100 images</td>
+						<td>99 images</td>
+						<td><a href="https://drive.google.com/open?id=1K8OyugZ_LuVETUveS2hBEwT8ffotn5jq">sim2real_sample.zip</a></td>
+					</tr>
+					<tr>
 						<td>Tote Sim2Real</td>
-						<td>11.1G</td>
+						<td>19.8GB</td>
+						<td>68608 images</td>
 						<td>5690 images</td>
-						<td>38483 images</td>
-						<td><a href="https://drive.google.com/file/d/1NVObe-L7jWHVESevPop077r-fpo7DYZQ/view?usp=sharing">tote_sim2real.zip</a></td>
+						<td>9472 images</td>
+						<td><a href="https://drive.google.com/open?id=1Ylb2aHAvpTKEC0UktbZNYotTZbRH7ZbS">sim2real.zip</a></td>
 					</tr>
 				</tbody>
 			</table>
