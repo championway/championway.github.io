@@ -1,0 +1,207 @@
+<!DOCTYPE HTML>
+<!--
+	Strata by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>David's website</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+	</head>
+	
+	<body id="top">
+
+		<!-- Header -->
+		<header id="header">
+			<div class="inner">
+				<a href="#" class="image avatar"><img src="images/profile_david.jpg" alt="" /></a>
+				<h1><strong>Pin-Wei "David" Chen</strong></h1>
+				<br />
+				<h1>MS Student @ <a href="http://www.nctu.edu.tw/" target="popup">NCTU</a></h1>
+				advised by <a href="https://arg-nctu.github.io/index.html" target="popup">Nick Wang</a>
+				<br />
+				<br />
+				<h1>Works on Robotics</h1>
+				@ <a href="https://arg-nctu.github.io/research.html" target="popup">Assistive Robotics Group</a>
+				<br />
+				<br />
+
+				<ul class="icons">
+					<li><a href="pdf/David_CV.pdf" target="popup" class="icon fa-user"><span class="label">CV</span></a></li>
+					<li><a href="https://www.facebook.com/cpwearth" target="popup" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
+					<li><a href="https://www.linkedin.com/in/pin-wei-chen/" target="popup" class="icon fa-linkedin"><span class="label">LinkIn</span></a></li>
+					<li><a href="https://github.com/championway" target="popup" class="icon fa-github"><span class="label">Github</span></a></li>
+					<li><a href="mailto:ccpwearth@gmail.com" target="popup" class="icon fa-envelope"><span class="label">EMail</span></a></li>
+					
+				</ul>
+			</div>
+			
+		</header>
+
+		<!-- Main -->
+		<div id="main">
+
+			<!-- About Me -->
+			<section id="about_me">
+				<header class="major">
+					<h2>About Me</h2>
+				</header>
+				<p>I am passionate about robotics, self-driving car and intelligent systems. During my M.S. I especially focus on computer vision using 
+				openCV, PCL and deep learning. I am very willing to stay updated with all new technology and have the ability to adapt to changing environment. 
+				My dream is to <b>build a robot which can make people have a better life.</b></p>
+				<!--<ul class="actions">
+					<li><a href="#" class="button">Learn More</a></li>
+				</ul>-->
+			</section>
+			
+			<section id=" Education"> 
+				<header class="major">
+					<h2>Education</h2>
+				</header>
+				<li><b>M.S.</b> in Institute of Electrical Control Engineering, National Chiao Tung University (<a href="http://www.nctu.edu.tw/" target="popup">NCTU</a>), Taiwan.<br />(2018~present)</li>
+				<li><b>B.S.</b> in Electrical and Computer Engineering (ECE), National Chiao Tung University (<a href="http://www.nctu.edu.tw/" target="popup">NCTU</a>), Taiwan.<br />(09/2014~06/2018)</li>
+				<li>Kaohsiung Municipal Kaohsiung Senior High School (<a href="http://web.kshs.kh.edu.tw/enkshs/" target="popup">KSHS</a>).<br />(09/2011~06/2014)</li>
+			</section>
+			
+			<!-- Projects and Experiences -->
+			<section id="projects_experience">
+				<header class="major">
+					<h2>Projects and Experiences</h2>
+				</header>
+				<div class="row">
+					<!-- left: 6u 12u$ right: 6u$ 12u$ -->
+					<!-- S2D -->
+					<article class="6u 12u$(xsmall) work-item">
+						<iframe width="360" height="240" src="https://www.youtube.com/embed/g79keyw5OSs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<h3>LiDAR Point Cloud from Sparse to Dense using GAN (2019/09)</h3>
+						<p>• I build a GAN model based on Pix2Pix to learn how to transform the point cloud projection image into a camera depth image.</p>
+						<p>• With camera matrix and the static transform between LiDAR and camera, I can easily transform the coordinate from point cloud to image, and vise versa.</p>
+						<p>• The code is available at my github repo: <a href="https://github.com/championway/lidar_S2D">https://github.com/championway/lidar_S2D</a></p>
+					</article>
+					<!-- SubT -->
+					<article class="6u 12u$(xsmall) work-item">
+						<iframe width="360" height="240" src="https://www.youtube.com/embed/MJ-GyAbDTLs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<h3>SubT Challenge NCTU Introduction (2019/08)</h3>
+						<p>• The DARPA SubT Challenge is a competition which seeks novel approaches to autonomous rapidly map, navigate,
+							and search artifacts in an unknown underground environments during time-sensitive combat operations.</p>
+						<p>• Team NCTU represent Taiwan to go for this competition. This is also not only ours but also Taiwan's first team who participate in DARPA competition.</p>
+						<p>• We got 7th place in this competition.</p>
+						<p align="right"></p>
+					</article>
+					<!-- SubT -->
+					<article class="6u 12u$(xsmall) work-item">
+						<iframe width="360" height="240" src="https://www.youtube.com/embed/WNhenb4Kb0Y" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<h3>Marine Robot Tracking with Image and Point Cloud (2019/03)</h3>
+						<p>• Marine robot tracking and following with image and point cloud.</p>
+						<p>• I use SSD (Single Shot Multibox Detector) and kalman filter to track the front robot, and use PID controller to follow the robot.</p>
+						<p>• I use point cloud to track two marine robots by Point Cloud Library (PCL), and then visualize the trajectories on Rviz.</p>
+					</article>
+					<!-- Multi-view CNN -->
+					<article class="6u 12u$(xsmall) work-item">
+						<iframe width="360" height="240" src="https://www.youtube.com/embed/-llRCISkNYE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<h3>Multi-view CNN Point CLoud Classification (2019/01)</h3>
+						<p>• The goal is to classify point cloud data from LIDAR sensor, and I use Point Cloud Library and deep learning to implement.</p>
+						<p>• This work is focus on using deep learning to classify 3D point cloud with 2D point cloud projection image.</p>
+						<p>• I also use this method in RobotX 2018 real-world competition, and got a good performance.</p>
+						<p align="right"></p>
+					</article>
+					<!-- Robotx --> 
+					<article class="6u 12u$(xsmall) work-item">
+						<iframe width="360" height="240" src="https://www.youtube.com/embed/fMAR_KSUHdQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<h3>Maritime Robotx Challenge (2018/12)</h3>
+						<p>• The challenge is about developing and using autonomous maritime systems on autonomous surface vehicle platforms and sensors held in December 2018 in Hawaii.</p>
+						<p>• 3D perception leader, I am in charge of 3D LIDAR and depth camera perception, including detection and classification using deep neurual network.</p>
+						<p>• We, team NCTU, got 5th place in RobotX competition, and this is also the first time that we participated in RobotX competition.</p>
+						<p align="right"><a href="https://robotx-nctu.github.io/">website</a> / <a href="pdf/journal-robotx-nctu.pdf">pdf</a> </p>
+					</article>
+					<!-- Self-driving robot -->
+					<article class="6u 12u$(xsmall) work-item">
+						<iframe width="360" height="240" src="https://www.youtube.com/embed/?listType=playlist&list=PL4u9dwf2lHUiYsNqL-mgDdxR2igJPYJAW&index=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<h3>NCTU self-driving robot (2018/06)</h3>
+						<p>• This project is to build a robot which can do self-navigate tast in campus with dynamic obstacle.</p>
+						<p>• The robot has IMU, GPS, wheel odometry and a 16-bin LIDAR on it.</p>
+						<p align="right"><a href="pdf/self_driving_robot.pdf">pdf</a> </p>
+					</article>
+					<!-- 3d_object_modeling -->
+					<article class="6u 12u$(xsmall) work-item">
+						<iframe width="360" height="240" src="https://www.youtube.com/embed/xTneIZJZ8fE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<h3>3D Object Modeling (2018/01)</h3>
+						<p>• Nowadays, people are using 3D information more often to do their work than 2D visual information. As a result, I use PCL, ICP, iSAM and apriltags to build a 3D point cloud modeling system with only one depth RGB camera</p>
+						<p align="right"><a href="pdf/3d_object_modeling.pdf">pdf</a> </p>
+					</article>
+					<!-- Patrolling robot -->
+					<article class="6u 12u$(xsmall) work-item">
+						<iframe width="360" height="240" src="https://www.youtube.com/embed/?listType=playlist&list=PL4u9dwf2lHUjpb5ASN0IdUQNEQFX7z83g&index=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<h3>Multi-robot patrolling system (2017/12)</h3>
+						<p>•  We realize that robot can help us with something routine and cycling, just like patrolling, which we should patrol lots of nodes again and again. As a result, I build a multi-robot patrolling system using ROS. It can apply to surveillance & security, and production line delivery.</p>
+						<p align="right"><a href="pdf/patrolling.pdf">pdf</a> </p>
+					</article>
+					<!-- Duckietown -->
+					<article class="6u 12u$(xsmall) work-item">
+						<a href="http://duckietown.nctu.edu.tw/" class="image fit thumb"><img src="images/projects/duckietown.jpg" alt="" /></a>
+						<h3>Duckietown @ NCTU, Autonomy Education and Research Platform (2017/09)</h3>
+						<p>• Teaching Assistant, Creative Software Project, Department of Electrical and Computer Engineering, NCTU, Taiwan, 09/2017 – 01/2018. </p>
+						<p align="right"><a href="http://duckietown.nctu.edu.tw/">website</a></p>
+					</article>
+				</div>
+			</section>
+		
+			<!-- Publications -->
+			<section id="publications">
+				<header class="major">
+					<h2>PUBLICATIONS</h2>
+				</header>
+				<p>[C1] N.-C. Lin, Y.-C. Hsiao, Y.-W. Huang, C.-T. Hung, T.-K. Chuang, <b>P.-W. Chen</b>, J.-T. Huang, C.-C. Hsu, A. Censi, M. Benjamin, C.-F. Chen, and H.-C. Wang. "Duckiepond: A Reproducible, Flexible, and ML-Compatible Education and Research Platform for a Fleet of Autonomous Maritime Vehicles," <i> Accepted by IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS 2019).</i> <a href="https://arg-nctu.github.io/publications/duckiepond-paper.pdf" target="popup" class="fa fa-file-pdf-o"></a></p>
+			</section>
+			
+			<!-- Honor and Awards -->
+			<section id="honor_awards">
+				<header class="major">
+					<h2>Honor and Awards</h2>
+				</header>
+				<li><b>Facebook PyRobot</b>, Facebook PyRobot: Democratizing Robotics-Research Award. 10/2019</li>
+				<li><b>7th Place</b>, 2019 DARPA Subterranean Challenge. 08/2019</li>
+				<li><b>5th Place</b>, 2018 RobotX Challenge ($4,000 USD). 12/2018</li>
+				<li><b>Best Single Day Performance</b>, 2018 RobotX Challenge ($2,000 USD). 12/2018</li>
+			</section>
+			
+			<!-- Leaderships -->
+			<section id="Leaderships"> 
+				<header class="major">
+					<h2>Leaderships</h2>
+				</header>
+				<!--p>• Captain of Kaohsiung Senior High School Basketball Team (2013~2014)</p-->
+				<li>DARPA Subterranean Challenge Autonomous and Perception Leader of Team NCTU (2019)</li>
+				<li>2018 RobotX Competition 3D Perception Leader of Team NCTU (5th place) (2018)</li>
+				<li>Co-founder and Leader of National Chiao Tung University Calligraphy Club(2016~2017)</li>
+				<li>Captain of Electrical and Computer Engineering Basketball Team (2016~2017)</li>
+				<li>Administrative Assistant of Student Association of Department of Electrical and Computer Engineering (2016~2017)</li>
+				<li>Captain of Kaohsiung Senior High School Basketball Team (2013~2014)</li>
+			</section>
+			
+		</div>
+
+		<!-- Footer -->
+		<footer id="footer">
+			<div class="inner">
+				<ul class="copyright">
+					<li>Design: <a href="http://html5up.net">HTML5 UP</a></li><li>ccpwearth@gmail.com</li><li>2019/10/11</li>
+				</ul>
+			</div>
+		</footer>
+
+		<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/jquery.poptrox.min.js"></script>
+		<script src="assets/js/skel.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+		<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
