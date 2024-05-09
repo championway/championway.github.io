@@ -11,6 +11,11 @@
        url("../fonts/flaticon/font/Flaticon.woff") format("woff"),
        url("../fonts/flaticon/font/Flaticon.ttf") format("truetype"),
        url("../fonts/flaticon/font/Flaticon.svg#Flaticon") format("svg");
+  src: url("../fonts/flaticon_1/Flaticon.eot");
+  src: url("../fonts/flaticon_1/Flaticon.eot?#iefix") format("embedded-opentype"),
+       url("../fonts/flaticon_1/Flaticon.woff") format("woff"),
+       url("../fonts/flaticon_1/Flaticon.ttf") format("truetype"),
+       url("../fonts/flaticon_1/Flaticon.svg#Flaticon") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -42,3 +47,12 @@
 .flaticon-polaroid-pictures:before { content: "\f103"; }
 .flaticon-big-lens:before { content: "\f104"; }
 .flaticon-film:before { content: "\f105"; }
+
+.flaticon-bitbucket-logotype-camera-lens-in-perspective:before { content: "\f100"; }
+.flaticon-squarespace-logo:before { content: "\f101"; }
+.flaticon-smug:before { content: "\f102"; }
+.flaticon-flickr-website-logo-silhouette:before { content: "\f103"; }
+.flaticon-github-logo:before { content: "\f104"; }
+.flaticon-behance-logo:before { content: "\f105"; }
+.flaticon-dribbble:before { content: "\f106"; }
+.flaticon-themeforest:before { content: "\f107"; }
