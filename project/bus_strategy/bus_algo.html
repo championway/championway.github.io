@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Digital Twin: Dev Console Mode</title>
+
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #1e1e1e;
+            --panel: #252526;
+            --accent: #0078d4;
+            --danger: #d13438;
+            --text: #d4d4d4;
+            --border: #3e3e3e;
+            --term-bg: #101010;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', monospace;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 2;
+        }
+
+        .header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            background: #333;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 1.1em;
+            color: #fff;
+        }
+
+        .control-group {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .control-group h3 {
+            margin: 0 0 10px 0;
+            font-size: 0.85em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px;
+            background: #3b3b3b;
+            border: 1px solid #555;
+            color: #eee;
+            cursor: pointer;
+            border-radius: 2px;
+            font-size: 0.9em;
+        }
+
+        .btn:hover {
+            background: #4b4b4b;
+        }
+
+        .btn.active {
+            background: var(--accent);
+            border-color: #005a9e;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn.minus {
+            color: #ff8b8b;
+            border-color: #663333;
+        }
+
+        .btn.minus.active {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn.run {
+            width: 100%;
+            background: #28a745;
+            border: none;
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn.run:hover {
+            background: #218838;
+        }
+
+        .btn.run:disabled {
+            background: #444;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .result-panel {
+            padding: 15px;
+            background: #111;
+            border-top: 1px solid var(--border);
+            font-family: 'Consolas', monospace;
+            font-size: 0.85em;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: #aaa;
+        }
+
+        .stat-row.total {
+            border-top: 1px solid #444;
+            padding-top: 5px;
+            margin-top: 5px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* Main Area */
+        .main-area {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Map Wrapper */
+        .map-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1e1e1e;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #grid-container {
+            display: grid;
+            gap: 1px;
+            background: #333;
+            border: 4px solid #444;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .cell {
+            width: 20px;
+            height: 20px;
+            background: #2d2d2d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: crosshair;
+            user-select: none;
+            position: relative;
+            /* For absolute positioning of labels */
+        }
+
+        .cell:hover {
+            border: 1px solid #fff;
+            z-index: 10;
+        }
+
+        .cell.wall {
+            background: #111;
+        }
+
+        .cell.start {
+            background: #28a745;
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0 0 10px #28a745;
+            z-index: 5;
+        }
+
+        .cell.end {
+            background: #dc3545;
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0 0 10px #dc3545;
+            z-index: 5;
+        }
+
+        .cell.passenger {
+            background: #0078d4;
+            color: #fff;
+        }
+
+        .cell.station {
+            box-shadow: inset 0 0 0 2px #FFD700;
+            z-index: 4;
+        }
+
+        .cell.route {
+            background: rgba(40, 167, 69, 0.4);
+        }
+
+        .cell.cost-zone {
+            background-image: repeating-linear-gradient(45deg,
+                    rgba(255, 140, 0, 0.2),
+                    rgba(255, 140, 0, 0.2) 5px,
+                    rgba(255, 140, 0, 0.4) 5px,
+                    rgba(255, 140, 0, 0.4) 10px);
+        }
+
+        .pax-label {
+            position: absolute;
+            top: 0;
+            left: 1px;
+            font-size: 8px;
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px #000;
+            pointer-events: none;
+        }
+
+        .cost-label {
+            position: absolute;
+            bottom: 0;
+            right: 1px;
+            font-size: 8px;
+            color: #ffcc00;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px #000;
+            pointer-events: none;
+        }
+
+        /* Terminal Area */
+        .terminal-container {
+            height: 200px;
+            background: var(--term-bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+        }
+
+        .term-header {
+            background: #252526;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            color: #888;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .term-body {
+            flex: 1;
+            padding: 10px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            overflow-y: auto;
+            color: #cccccc;
+            white-space: pre-wrap;
+        }
+
+        .log-info {
+            color: #6A9955;
+        }
+
+        /* System msg */
+        .log-out {
+            color: #DCDCAA;
+        }
+
+        /* Python print */
+        .log-err {
+            color: #F48771;
+        }
+
+        /* Python error */
+
+        /* Code Panel */
+        .gutter {
+            width: 10px;
+            background: #2d2d2d;
+            border-left: 1px solid var(--border);
+            cursor: col-resize;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gutter:hover {
+            background: var(--accent);
+        }
+
+        .code-panel {
+            width: 450px;
+            background: #1e1e1e;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--border);
+        }
+
+        .api-header {
+            padding: 8px 15px;
+            background: #252526;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85em;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .CodeMirror {
+            height: 100%;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="header">
+            <h2>🚌 TwinEngine Dev</h2>
+        </div>
+        <div class="control-group">
+            <h3>Tools</h3>
+            <div class="tools-grid">
+                <button class="btn active" onclick="setTool('start')" id="t-start">A (Start)</button>
+                <button class="btn" onclick="setTool('end')" id="t-end">B (End)</button>
+                <button class="btn" onclick="setTool('passenger')" id="t-pass">+ Passenger</button>
+                <button class="btn minus" onclick="setTool('passenger-minus')" id="t-pass-minus">- Passenger</button>
+                <button class="btn" onclick="setTool('cost-plus')" id="t-cost-plus">+ Station Cost</button>
+                <button class="btn minus" onclick="setTool('cost-minus')" id="t-cost-minus">- Station Cost</button>
+                <button class="btn" onclick="setTool('wall')" id="t-wall">Wall</button>
+                <button class="btn" onclick="initGrid()">Reset</button>
+            </div>
+            <div style="margin-top:10px; border-top:1px solid #444; padding-top:10px;">
+                <label>Station Cost Increment: <span id="val-paint">10</span></label>
+                <input type="range" id="paint-val" min="5" max="100" step="5" value="10"
+                    oninput="document.getElementById('val-paint').innerText=this.value">
+            </div>
+        </div>
+        <div class="control-group">
+            <h3>Weights</h3>
+            <label>Route : <span id="val-w1">1.0</span></label>
+            <input type="range" id="w1" min="0.1" max="5" step="0.1" value="1" oninput="updateLabels()">
+            <label>Station : <span id="val-w2">50</span></label>
+            <input type="range" id="w2" min="0" max="200" step="10" value="50" oninput="updateLabels()">
+            <label>Walk : <span id="val-w3">2.0</span></label>
+            <input type="range" id="w3" min="0.1" max="10" step="0.1" value="2" oninput="updateLabels()">
+        </div>
+        <div class="control-group">
+            <h3>Algorithm</h3>
+            <label for="algo-select" style="display:block; margin-bottom:6px;">選擇演算法策略</label>
+            <select id="algo-select"
+                style="width:100%; padding:6px; border-radius:4px; background:#222; color:#eee; border:1px solid #444;">
+                <option value="greedy_insert">Greedy Insertion</option>
+                <option value="cluster_first">Cluster-first, Route-second</option>
+                <option value="route_first">Route-first, Stop-second</option>
+            </select>
+        </div>
+        <div class="result-panel">
+            <div style="text-align:center; margin-bottom:10px; color:#666;">Cost Analysis</div>
+            <div id="stats-content" style="color:#888; text-align:center;">Waiting for run...</div>
+        </div>
+    </div>
+
+    <div class="main-area" id="mainArea">
+        <div class="map-wrapper">
+            <div id="grid-container"></div>
+        </div>
+        <div class="terminal-container">
+            <div class="term-header">
+                <span>TERMINAL (stdout)</span>
+                <button style="background:none; border:none; color:#888; cursor:pointer;"
+                    onclick="document.getElementById('term-output').innerHTML=''">Clear</button>
+            </div>
+            <div class="term-body" id="term-output"></div>
+        </div>
+    </div>
+
+    <div class="gutter" id="resizer"></div>
+
+    <div class="code-panel" id="codePanel">
+        <div class="api-header">
+            <span>algorithm.py</span>
+            <span style="color:var(--accent)">Python 3.11</span>
+        </div>
+        <textarea id="python-code"></textarea>
+        <button class="btn run" id="btn-run" onclick="callApi()">
+            <div class="spinner" id="spinner" style="display:none"></div>
+            <span>RUN & DEBUG</span>
+        </button>
+    </div>
+
+    <script>
+        // --- JAVASCRIPT TERMINAL INTERFACE ---
+        function termWrite(text, type = 'log-out') {
+            const term = document.getElementById('term-output');
+            // Handle newlines properly for HTML
+            const span = document.createElement('span');
+            span.className = type;
+            span.textContent = text;
+            term.appendChild(span);
+            term.scrollTop = term.scrollHeight;
+        }
+
+        // Expose to window for Python to call
+        window.termWrite = termWrite;
+
+        // --- PYTHON DEFAULT CODE (With Print Debugging) ---
+        const apiTemplate = `import json
+import random
+import heapq
+import sys
+from typing import List, Dict, Tuple, Any
+
+# ============================================================
+#  Common utilities & input unpacking
+# ============================================================
+
+def unpacked_input_data_from_web(payload: Dict[str, Any]):
+    """
+    Convert the JSON payload from the web front-end into Python structures.
+
+    Expected payload fields:
+      - grid_size: int
+      - passengers: list of {x:int, y:int, count:int}
+      - walls: list of {x:int, y:int}
+      - start: {x:int, y:int}
+      - end: {x:int, y:int}
+      - station_costs: list of {x:int, y:int, cost:float or int}  (optional)
+      - weights: { w1:float, w2:float, w3:float }  (optional)
+         w1: route cost weight
+         w2: base station cost weight
+         w3: walking cost weight
+      - algo: str (optional)  # "route_first", "cluster_first", "greedy_insert"
+    """
+    grid_size = int(payload["grid_size"])
+    passengers = payload.get("passengers", [])
+    walls = set((w["x"], w["y"]) for w in payload.get("walls", []))
+    start_node = payload["start"]
+    end_node = payload["end"]
+
+    # Station terrain cost map
+    terrain_cost_map = {}
+    if "station_costs" in payload:
+        for item in payload["station_costs"]:
+            terrain_cost_map[(item["x"], item["y"])] = float(item["cost"])
+
+    weights = payload.get("weights", {})
+    w_route = float(weights.get("w1", 1.0))
+    w_base_station = float(weights.get("w2", 50.0))
+    w_walk = float(weights.get("w3", 2.0))
+
+    algo = payload.get("algo", "route_first")
+
+    return (
+        grid_size,
+        passengers,
+        walls,
+        start_node,
+        end_node,
+        terrain_cost_map,
+        w_route,
+        w_base_station,
+        w_walk,
+        algo,
+    )
+
+
+# ------------------------------------------------------------
+#  Grid helpers & A* pathfinding
+# ------------------------------------------------------------
+
+def in_bounds(x: int, y: int, n: int) -> bool:
+    return 0 <= x < n and 0 <= y < n
+
+
+def neighbors4(x: int, y: int, n: int, walls: set):
+    """4-neighborhood on grid, skipping walls."""
+    for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        nx, ny = x + dx, y + dy
+        if in_bounds(nx, ny, n) and (nx, ny) not in walls:
+            yield nx, ny
+
+
+def astar(start: Dict[str, int], goal: Dict[str, int], n: int, walls: set) -> List[Dict[str, int]]:
+    """
+    Simple A* search on the grid with uniform edge cost 1 and 4-neighbors.
+    Returns a list of nodes [{"x":..., "y":...}, ...] from start to goal (inclusive),
+    or [] if no path exists.
+    """
+    sx, sy = start["x"], start["y"]
+    gx, gy = goal["x"], goal["y"]
+    start_key = (sx, sy)
+    goal_key = (gx, gy)
+
+    if start_key == goal_key:
+        return [dict(x=sx, y=sy)]
+
+    open_heap = []
+    # (f, g, (x, y))
+    h0 = abs(sx - gx) + abs(sy - gy)
+    heapq.heappush(open_heap, (h0, 0, start_key))
+
+    g_score = {start_key: 0}
+    came_from = {}
+
+    while open_heap:
+        f, g, (x, y) = heapq.heappop(open_heap)
+        if (x, y) == goal_key:
+            # reconstruct path
+            path = []
+            cur = goal_key
+            while cur in came_from:
+                path.append({"x": cur[0], "y": cur[1]})
+                cur = came_from[cur]
+            path.append({"x": sx, "y": sy})
+            path.reverse()
+            return path
+
+        for nx, ny in neighbors4(x, y, n, walls):
+            ng = g + 1
+            if ng < g_score.get((nx, ny), float("inf")):
+                g_score[(nx, ny)] = ng
+                came_from[(nx, ny)] = (x, y)
+                h = abs(nx - gx) + abs(ny - gy)
+                heapq.heappush(open_heap, (ng + h, ng, (nx, ny)))
+
+    return []
+
+
+def manhattan(a: Dict[str, int], b: Dict[str, int]) -> int:
+    return abs(a["x"] - b["x"]) + abs(a["y"] - b["y"])
+
+
+def compute_total_cost(
+    route: List[Dict[str, int]],
+    stations: List[Dict[str, int]],
+    passengers: List[Dict[str, int]],
+    start_node: Dict[str, int],
+    end_node: Dict[str, int],
+    w_route: float,
+    w_base_station: float,
+    w_walk: float,
+    terrain_cost_map: Dict[Tuple[int, int], float],
+) -> float:
+    """
+    Route cost + station cost + passenger walking cost.
+    The route list is already the discrete path (each step cost=1).
+    """
+    # Route cost
+    route_cost = w_route * max(0, len(route) - 1)
+
+    # Station cost
+    station_cost = 0.0
+    for s in stations:
+        xy = (s["x"], s["y"])
+        base = w_base_station
+        terrain = terrain_cost_map.get(xy, 0.0)
+        station_cost += (base + terrain)
+
+    # Walking cost (passengers choose nearest stop: any station or A/B)
+    stops = stations + [start_node, end_node]
+    walk_cost = 0.0
+    for p in passengers:
+        px = {"x": p["x"], "y": p["y"]}
+        cnt = p.get("count", 1)
+        best_d = float("inf")
+        for st in stops:
+            d = manhattan(px, st)
+            if d < best_d:
+                best_d = d
+        walk_cost += w_walk * best_d * cnt
+
+    return route_cost + station_cost + walk_cost
+
+
+# ============================================================
+#  Strategy 2: Route-first, Stop-second
+# ============================================================
+
+def algo_route_first(
+    n: int,
+    passengers: List[Dict[str, int]],
+    walls: set,
+    start_node: Dict[str, int],
+    end_node: Dict[str, int],
+    terrain_cost_map: Dict[Tuple[int, int], float],
+    w_route: float,
+    w_base_station: float,
+    w_walk: float,
+) -> Tuple[List[Dict[str, int]], List[Dict[str, int]]]:
+    """
+    1. 先用 A* 找出 A->B 的主路線走廊 (固定)
+    2. 把乘客投影到這條路線上，變成 1D demand points
+    3. 在 1D 上用 greedy 方式選站點：
+       - 每次嘗試在路線上的某個格子加站
+       - 計算乘客走路成本下降量 - 建站成本
+       - 若 net gain > 0 就加入該站，直到沒有正收益
+    """
+    print("[algo_route_first] Start Route-first, Stop-second...")
+    # 1) 主路線走廊
+    base_route = astar(start_node, end_node, n, walls)
+    if not base_route:
+        print("  WARNING: A* could not find route. Returning direct XY path ignoring walls.")
+        # direct fallback (ignores walls)
+        base_route = []
+        cx, cy = start_node["x"], start_node["y"]
+        gx, gy = end_node["x"], end_node["y"]
+        step_x = 1 if gx >= cx else -1
+        for x in range(cx, gx, step_x):
+            base_route.append({"x": x, "y": cy})
+        step_y = 1 if gy >= cy else -1
+        for y in range(cy, gy + step_y, step_y):
+            base_route.append({"x": gx, "y": y})
+
+    print(f"  Base route length: {len(base_route)}")
+
+    # 2) 乘客投影到 route 上 (存 index)
+    route_positions = base_route
+
+    def walk_cost_with_station_indices(station_indices: set) -> float:
+        st_list = [route_positions[i] for i in station_indices]
+        stops = [dict(x=s["x"], y=s["y"]) for s in st_list] + [start_node, end_node]
+        total = 0.0
+        for p in passengers:
+            px = {"x": p["x"], "y": p["y"]}
+            cnt = p.get("count", 1)
+            best_d = float("inf")
+            for st in stops:
+                d = manhattan(px, st)
+                if d < best_d:
+                    best_d = d
+            total += best_d * cnt * w_walk
+        return total
+
+    stations_indices = set()
+    current_walk_cost = walk_cost_with_station_indices(stations_indices)
+    print(f"  Initial walking cost (no mid-stations): {current_walk_cost:.2f}")
+
+    max_stations = max(1, min(10, len(route_positions) // 4))
+
+    for _ in range(max_stations):
+        best_gain = 0.0
+        best_idx = None
+        for i in range(len(route_positions)):
+            if i in stations_indices:
+                continue
+            cell = route_positions[i]
+            xy = (cell["x"], cell["y"])
+            terrain = terrain_cost_map.get(xy, 0.0)
+            station_cost = w_base_station + terrain
+
+            new_indices = set(stations_indices)
+            new_indices.add(i)
+            new_walk_cost = walk_cost_with_station_indices(new_indices)
+            walk_gain = current_walk_cost - new_walk_cost
+            net_gain = walk_gain - station_cost
+            if net_gain > best_gain:
+                best_gain = net_gain
+                best_idx = i
+
+        if best_idx is None or best_gain <= 0:
+            print(f"  Stop adding stations, best_gain={best_gain:.2f}")
+            break
+
+        stations_indices.add(best_idx)
+        current_walk_cost = walk_cost_with_station_indices(stations_indices)
+        print(f"  Add station at route index {best_idx}, walk_cost={current_walk_cost:.2f}, gain={best_gain:.2f}")
+
+    stations = []
+    for i in sorted(stations_indices):
+        cell = route_positions[i]
+        stations.append({"x": cell["x"], "y": cell["y"]})
+
+    final_route = base_route
+    print(f"[algo_route_first] Done. Stations={len(stations)}, route_len={len(final_route)}")
+    return stations, final_route
+
+
+# ============================================================
+#  Strategy 3: Cluster-first, Route-second
+# ============================================================
+
+def choose_k_for_clusters(passengers: List[Dict[str, int]], w_base_station: float, w_walk: float, max_k: int = 8) -> int:
+    """Simple heuristic to decide number of clusters."""
+    if not passengers:
+        return 0
+    unique_pts = len(passengers)
+    if unique_pts == 1:
+        return 1
+
+    ratio = w_base_station / max(w_walk, 1e-6)
+    if ratio > 100:
+        k = 1
+    elif ratio > 60:
+        k = 2
+    elif ratio > 30:
+        k = 3
+    else:
+        k = 4
+
+    k = max(1, min(k, unique_pts, max_k))
+    return k
+
+
+def kmeans_passenger_clusters(
+    n: int,
+    passengers: List[Dict[str, int]],
+    walls: set,
+    w_base_station: float,
+    w_walk: float,
+    terrain_cost_map: Dict[Tuple[int, int], float],
+) -> List[Dict[str, int]]:
+    """
+    Simple K-means clustering on passenger coordinates.
+    Returns cluster centroids as station candidates.
+    這個版本會在決定中心時，同時考慮：
+      - 乘客距離（用 manhattan） → 對應 w_walk
+      - 地形成本 terrain_cost_map → 對應 station cost
+    """
+    if not passengers:
+        return []
+
+    k = choose_k_for_clusters(passengers, w_base_station, w_walk)
+    print(f"[cluster_first] Using k={k} clusters for {len(passengers)} passenger cells.")
+
+    # 初始中心: 隨機選 k 個乘客位置
+    if len(passengers) <= k:
+        centers = [{"x": p["x"], "y": p["y"]} for p in passengers]
+    else:
+        centers = random.sample(passengers, k)
+        centers = [{"x": p["x"], "y": p["y"]} for p in centers]
+
+    # K-means 迭代
+    for _ in range(6):
+        clusters = [[] for _ in range(k)]
+        for p in passengers:
+            px = {"x": p["x"], "y": p["y"]}
+            dists = [manhattan(px, c) for c in centers]
+            idx = dists.index(min(dists))
+            clusters[idx].append(p)
+
+        new_centers = []
+        for idx in range(k):
+            if not clusters[idx]:
+                new_centers.append(centers[idx])
+                continue
+
+            # 先算「乘客重心」
+            total_weight = sum(p.get("count", 1) for p in clusters[idx])
+            avg_x = sum(p["x"] * p.get("count", 1) for p in clusters[idx]) / total_weight
+            avg_y = sum(p["y"] * p.get("count", 1) for p in clusters[idx]) / total_weight
+            tx, ty = int(round(avg_x)), int(round(avg_y))
+            tx = max(0, min(n - 1, tx))
+            ty = max(0, min(n - 1, ty))
+
+            # 在重心附近找一個「距離 + 地形成本」都合理的格子
+            best_cell = None
+            best_score = float("inf")
+
+            max_radius = 2
+            for radius in range(0, max_radius + 1):
+                for dx in range(-radius, radius + 1):
+                    for dy in range(-radius, radius + 1):
+                        nx, ny = tx + dx, ty + dy
+                        if not in_bounds(nx, ny, n) or (nx, ny) in walls:
+                            continue
+
+                        # 代表乘客距離：用 cluster 重心當代表
+                        dist = abs(nx - avg_x) + abs(ny - avg_y)
+                        terrain = terrain_cost_map.get((nx, ny), 0.0)
+                        # 綜合 cost：走路成本 + 地形成本
+                        score = w_walk * dist + terrain
+
+                        if score < best_score:
+                            best_score = score
+                            best_cell = (nx, ny)
+
+            if best_cell is None:
+                # 沒找到（理論上很少發生），就回退用原始重心（如果不是牆）
+                if (tx, ty) in walls:
+                    found = False
+                    for radius in range(1, 4):
+                        for dx in range(-radius, radius + 1):
+                            for dy in range(-radius, radius + 1):
+                                nx, ny = tx + dx, ty + dy
+                                if in_bounds(nx, ny, n) and (nx, ny) not in walls:
+                                    best_cell = (nx, ny)
+                                    found = True
+                                    break
+                            if found:
+                                break
+                    if best_cell is None:
+                        best_cell = (tx, ty)
+                else:
+                    best_cell = (tx, ty)
+
+            cx, cy = best_cell
+            new_centers.append({"x": cx, "y": cy})
+
+        centers = new_centers
+
+    print("[cluster_first] Cluster centers (with terrain):", [(c["x"], c["y"]) for c in centers])
+    return centers
+
+
+def build_route_through_points(
+    n: int,
+    walls: set,
+    points: List[Dict[str, int]],
+) -> List[Dict[str, int]]:
+    """Use A* to connect points in given order."""
+    route = []
+    for i in range(len(points) - 1):
+        seg = astar(points[i], points[i + 1], n, walls)
+        if not seg:
+            print(f"  WARNING: A* failed between {points[i]} and {points[i+1]}")
+            continue
+        if not route:
+            route.extend(seg)
+        else:
+            route.extend(seg[1:])  # avoid duplicate node at joint
+    return route
+
+
+def algo_cluster_first(
+    n: int,
+    passengers: List[Dict[str, int]],
+    walls: set,
+    start_node: Dict[str, int],
+    end_node: Dict[str, int],
+    terrain_cost_map: Dict[Tuple[int, int], float],
+    w_route: float,
+    w_base_station: float,
+    w_walk: float,
+) -> Tuple[List[Dict[str, int]], List[Dict[str, int]]]:
+    """
+    1. 先對乘客做 clustering 找出候選站點區域（同時考慮地形成本）
+    2. 把 cluster center snap 到可設站位置
+    3. 視 A, B + 這些站為要拜訪的節點，用簡單 heuristic 串成路線 (Nearest Neighbor + A*)
+    """
+    print("[algo_cluster_first] Start Cluster-first, Route-second...")
+    if not passengers:
+        print("  No passengers; fallback to direct route.")
+        route = astar(start_node, end_node, n, walls)
+        if not route:
+            route = [start_node, end_node]
+        return [], route
+
+    # 1) clustering 取得站點候選（這裡已考慮 terrain_cost_map）
+    stations = kmeans_passenger_clusters(
+        n, passengers, walls, w_base_station, w_walk, terrain_cost_map
+    )
+    if not stations:
+        route = astar(start_node, end_node, n, walls)
+        if not route:
+            route = [start_node, end_node]
+        return [], route
+
+    # 2) 用 Nearest Neighbor 決定拜訪順序
+    remaining = stations[:]
+    ordered = [start_node]
+    cur = start_node
+    while remaining:
+        dists = [manhattan(cur, s) for s in remaining]
+        idx = dists.index(min(dists))
+        nxt = remaining.pop(idx)
+        ordered.append(nxt)
+        cur = nxt
+    ordered.append(end_node)
+
+    # 3) 用 A* 串接
+    route = build_route_through_points(n, walls, ordered)
+    print(f"[algo_cluster_first] Done. Stations={len(stations)}, route_len={len(route)}")
+    return stations, route
+
+
+# ============================================================
+#  Strategy 4: Greedy Insertion
+# ============================================================
+
+def algo_greedy_insertion(
+    n: int,
+    passengers: List[Dict[str, int]],
+    walls: set,
+    start_node: Dict[str, int],
+    end_node: Dict[str, int],
+    terrain_cost_map: Dict[Tuple[int, int], float],
+    w_route: float,
+    w_base_station: float,
+    w_walk: float,
+    max_iterations: int = 10,
+) -> Tuple[List[Dict[str, int]], List[Dict[str, int]]]:
+    """
+    Greedy Insertion:
+      1. 先求 A->B 初始路線
+      2. 將候選站點設為「所有乘客座標」（避免整個地圖）
+      3. 每一輪：
+         - 嘗試將其中一個候選站點加入 stations
+         - 用簡單 heuristic 重新算 route：
+             A -> existing stations + new candidate (Nearest Neighbor) -> B
+           並用 A* 串接各 segment
+         - 計算總成本變化
+         - 若最佳候選可降低成本，則接受，更新 stations & route
+         - 否則停止
+    """
+    print("[algo_greedy_insertion] Start Greedy Insertion...")
+    # 1) initial route
+    route = astar(start_node, end_node, n, walls)
+    if not route:
+        print("  WARNING: A* could not find route. Using simple XY path fallback.")
+        route = []
+        cx, cy = start_node["x"], start_node["y"]
+        gx, gy = end_node["x"], end_node["y"]
+        step_x = 1 if gx >= cx else -1
+        for x in range(cx, gx, step_x):
+            route.append({"x": x, "y": cy})
+        step_y = 1 if gy >= cy else -1
+        for y in range(cy, gy + step_y, step_y):
+            route.append({"x": gx, "y": y})
+
+    stations: List[Dict[str, int]] = []
+    current_cost = compute_total_cost(
+        route,
+        stations,
+        passengers,
+        start_node,
+        end_node,
+        w_route,
+        w_base_station,
+        w_walk,
+        terrain_cost_map,
+    )
+    print(f"  Initial total cost: {current_cost:.2f}, route_len={len(route)}")
+
+    # 2) candidate stations = unique passenger locations
+    candidate_cells = {}
+    for p in passengers:
+        xy = (p["x"], p["y"])
+        if xy in walls:
+            continue
+        candidate_cells[xy] = {"x": p["x"], "y": p["y"]}
+
+    candidates = list(candidate_cells.values())
+
+    # 3) Greedy loop
+    for it in range(max_iterations):
+        best_delta = 0.0
+        best_cand = None
+        best_new_route = None
+
+        for c in candidates:
+            if c in stations:
+                continue
+            new_stations = stations + [c]
+
+            # A -> all stations (NN) -> B
+            remaining = new_stations[:]
+            cur = start_node
+            ordered = [start_node]
+            while remaining:
+                dists = [manhattan(cur, s) for s in remaining]
+                idx = dists.index(min(dists))
+                nxt = remaining.pop(idx)
+                ordered.append(nxt)
+                cur = nxt
+            ordered.append(end_node)
+
+            new_route = build_route_through_points(n, walls, ordered)
+            if not new_route:
+                continue
+
+            new_cost = compute_total_cost(
+                new_route,
+                new_stations,
+                passengers,
+                start_node,
+                end_node,
+                w_route,
+                w_base_station,
+                w_walk,
+                terrain_cost_map,
+            )
+            delta = current_cost - new_cost  # positive => improvement
+
+            if delta > best_delta:
+                best_delta = delta
+                best_cand = c
+                best_new_route = new_route
+
+        if best_cand is None or best_delta <= 1e-6:
+            print(f"  Stop at iteration {it}, best_delta={best_delta:.4f}")
+            break
+
+        stations.append(best_cand)
+        route = best_new_route
+        current_cost -= best_delta
+        print(
+            f"  Iter {it}: add station {best_cand}, "
+            f"new_cost={current_cost:.2f}, route_len={len(route)}, delta={best_delta:.2f}"
+        )
+
+    print(f"[algo_greedy_insertion] Done. Stations={len(stations)}, route_len={len(route)}")
+    return stations, route
+
+
+# ============================================================
+#  Main entry point for the web front-end
+# ============================================================
+
+def solve(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Entry point called from the web front-end (Pyodide).
+    "payload" is a Python dict parsed from JSON.
+
+    The Python code will be concatenated with a wrapper:
+
+        res = solve(json.loads(json_input))
+
+    and the return value must be JSON-serializable with fields:
+      - stations: list of {x, y}
+      - route: list of {x, y}
+
+    You can select algorithm via payload["algo"]:
+      - "route_first"      (default)
+      - "cluster_first"
+      - "greedy_insert"
+    """
+    (
+        grid_size,
+        passengers,
+        walls,
+        start_node,
+        end_node,
+        terrain_cost_map,
+        w_route,
+        w_base_station,
+        w_walk,
+        algo,
+    ) = unpacked_input_data_from_web(payload)
+
+    print("=== Digital Twin: Bus Planning Backend ===")
+    print(f"Grid: {grid_size}x{grid_size}")
+    print(f"Passengers cells: {len(passengers)}")
+    print(f"Walls: {len(walls)}")
+    print(f"Weights: route={w_route}, station_base={w_base_station}, walk={w_walk}")
+    print(f"Selected algorithm: {algo}")
+
+    if algo == "cluster_first":
+        stations, route_nodes = algo_cluster_first(
+            grid_size,
+            passengers,
+            walls,
+            start_node,
+            end_node,
+            terrain_cost_map,
+            w_route,
+            w_base_station,
+            w_walk,
+        )
+    elif algo == "greedy_insert":
+        stations, route_nodes = algo_greedy_insertion(
+            grid_size,
+            passengers,
+            walls,
+            start_node,
+            end_node,
+            terrain_cost_map,
+            w_route,
+            w_base_station,
+            w_walk,
+        )
+    else:
+        # default: route_first
+        stations, route_nodes = algo_route_first(
+            grid_size,
+            passengers,
+            walls,
+            start_node,
+            end_node,
+            terrain_cost_map,
+            w_route,
+            w_base_station,
+            w_walk,
+        )
+
+    return {
+        "stations": [{"x": int(s["x"]), "y": int(s["y"])} for s in stations],
+        "route": [{"x": int(p["x"]), "y": int(p["y"])} for p in route_nodes],
+    }
+`;
+
+        // --- SYSTEM STATE ---
+        let size = 30;
+        let grid = [];
+        let startPos = null; // These track the LOGICAL position
+        let endPos = null;
+        let passengers = [];
+        let pyodide = null;
+        let editor = null;
+        let tool = 'start';
+
+        // --- INITIALIZATION ---
+        window.onload = async function () {
+            try {
+                termWrite("Initializing Grid...", 'log-info');
+                initGrid();
+                termWrite("Grid Initialized.", 'log-info');
+
+                editor = CodeMirror.fromTextArea(document.getElementById("python-code"), {
+                    mode: "python", theme: "dracula", lineNumbers: true
+                });
+                editor.setValue(apiTemplate.trim());
+                updateLabels();
+
+                termWrite("System initialized.\\n", 'log-info');
+                termWrite("Loading Pyodide (Python Runtime)... \\n", 'log-info');
+
+                pyodide = await loadPyodide();
+
+                // Redirect Python stdout to JS terminal
+                await pyodide.runPythonAsync(`
+import sys
+from js import termWrite
+
+class StdoutCatcher:
+    def write(self, message):
+        termWrite(message, 'log-out')
+    def flush(self):
+        pass
+
+class StderrCatcher:
+    def write(self, message):
+        termWrite(message, 'log-err')
+    def flush(self):
+        pass
+
+sys.stdout = StdoutCatcher()
+sys.stderr = StderrCatcher()
+print("Python Environment Ready.")
+    `);
+            } catch (e) {
+                console.error(e);
+                termWrite(`CRITICAL ERROR: ${e.message}`, 'log-err');
+            }
+        };
+
+        // --- GRID LOGIC (BUG FIX INCLUDED) ---
+        function initGrid() {
+            const container = document.getElementById('grid-container');
+            if (!container) {
+                console.error("Grid container not found!");
+                return;
+            }
+            container.innerHTML = '';
+            container.style.gridTemplateColumns = `repeat(${size}, 20px)`;
+            grid = []; passengers = [];
+
+            // Reset Global Vars
+            startPos = null;
+            endPos = null;
+
+            for (let y = 0; y < size; y++) {
+                let row = [];
+                for (let x = 0; x < size; x++) {
+                    let d = document.createElement('div');
+                    d.className = 'cell';
+                    d.dataset.x = x; d.dataset.y = y;
+                    d.onmousedown = (e) => handleInteraction(x, y, e);
+                    d.onmouseover = (e) => { if (e.buttons === 1) handleInteraction(x, y, e); }
+                    container.appendChild(d);
+                    row.push({ div: d, type: 0, cost: 0 });
+                }
+                grid.push(row);
+            }
+
+            // BUG FIX: Explicitly set the variable AND the visuals
+            let sx = 2, sy = 2;
+            let ex = 27, ey = 27;
+
+            // Set logic vars
+            startPos = { x: sx, y: sy };
+            endPos = { x: ex, y: ey };
+
+            // Set visuals
+            setCellVisual(sx, sy, 'start');
+            setCellVisual(ex, ey, 'end');
+
+            document.getElementById('stats-content').innerHTML = 'Map Reset.';
+        }
+
+        function setCellVisual(x, y, type) {
+            let cell = grid[y][x].div;
+            cell.className = `cell ${type}`;
+            if (type === 'start') cell.innerText = 'A';
+            else if (type === 'end') cell.innerText = 'B';
+            else cell.innerText = '';
+        }
+
+        function clearCellVisual(x, y) {
+            let cell = grid[y][x].div;
+            cell.className = 'cell';
+            cell.innerText = '';
+            cell.style.backgroundColor = ''; // Clear pax color
+            cell.title = '';
+            // Restore visuals if data exists
+            updateCellVisual(x, y);
+        }
+
+        function setTool(t) {
+            tool = t;
+            document.querySelectorAll('.sidebar .btn').forEach(b => b.classList.remove('active'));
+            // Handle ID mapping for new tools
+            let id = 't-' + t;
+            if (t === 'passenger') id = 't-pass';
+            if (t === 'passenger-minus') id = 't-pass-minus';
+
+            if (document.getElementById(id)) document.getElementById(id).classList.add('active');
+        }
+
+        function handleInteraction(x, y, e) {
+            let cell = grid[y][x];
+
+            if (tool === 'start') {
+                // 1. Clear Old
+                if (startPos) clearCellVisual(startPos.x, startPos.y);
+                // 2. Set New
+                startPos = { x, y };
+                setCellVisual(x, y, 'start');
+
+            } else if (tool === 'end') {
+                if (endPos) clearCellVisual(endPos.x, endPos.y);
+                endPos = { x, y };
+                setCellVisual(x, y, 'end');
+
+            } else if (tool === 'wall') {
+                if (isProtected(x, y)) return;
+                if (cell.type === 1) {
+                    cell.type = 0; clearCellVisual(x, y);
+                } else {
+                    cell.type = 1; cell.div.className = 'cell wall'; cell.div.innerText = '';
+                    passengers = passengers.filter(p => p.x !== x || p.y !== y);
+                }
+
+            } else if (tool === 'passenger') {
+                if (isProtected(x, y) || cell.type === 1) return;
+                let p = passengers.find(p => p.x === x && p.y === y);
+                if (p) p.count++; else passengers.push({ x, y, count: 1 });
+                updateCellVisual(x, y);
+
+            } else if (tool === 'passenger-minus') {
+                let idx = passengers.findIndex(p => p.x === x && p.y === y);
+                if (idx !== -1) {
+                    passengers[idx].count--;
+                    if (passengers[idx].count <= 0) {
+                        passengers.splice(idx, 1);
+                    }
+                    updateCellVisual(x, y);
+                }
+            } else if (tool === 'cost-plus') {
+                if (isProtected(x, y) || cell.type === 1) return;
+                let val = parseInt(document.getElementById('paint-val').value);
+                cell.cost += val;
+                updateCellVisual(x, y);
+            } else if (tool === 'cost-minus') {
+                if (isProtected(x, y) || cell.type === 1) return;
+                let val = parseInt(document.getElementById('paint-val').value);
+                cell.cost = Math.max(0, cell.cost - val);
+                updateCellVisual(x, y);
+            }
+        }
+
+        function isProtected(x, y) {
+            return (startPos && startPos.x === x && startPos.y === y) ||
+                (endPos && endPos.x === x && endPos.y === y);
+        }
+
+        function updateCellVisual(x, y) {
+            let cellData = grid[y][x];
+            let div = cellData.div;
+            let p = passengers.find(p => p.x === x && p.y === y);
+
+            // Check if protected or wall
+            if (div.classList.contains('start') || div.classList.contains('end') || div.classList.contains('wall')) return;
+
+            // Reset to base
+            div.className = 'cell';
+            div.innerText = '';
+            div.style.backgroundColor = '';
+
+            let tooltip = [];
+
+            // 2. Apply Cost
+            if (cellData.cost > 0) {
+                div.classList.add('cost-zone');
+                tooltip.push(`Cost: ${cellData.cost}`);
+            }
+
+            // 3. Apply Passenger
+            if (p && p.count > 0) {
+                div.classList.add('passenger');
+                let alpha = Math.min(0.4 + (p.count * 0.1), 1.0);
+                div.style.backgroundColor = `rgba(0, 120, 212, ${alpha})`;
+                tooltip.push(`Pax: ${p.count}`);
+            }
+
+            div.title = tooltip.join(', ');
+
+            // 4. Render Content
+            let html = '';
+            if (p && p.count > 0) {
+                html += `<span class="pax-label">${p.count}</span>`;
+            }
+            if (cellData.cost > 0) {
+                html += `<span class="cost-label">${cellData.cost}</span>`;
+            }
+            // Preserve Start/End text if they exist (though usually exclusive)
+            if (div.classList.contains('start')) html = 'A';
+            else if (div.classList.contains('end')) html = 'B';
+
+            div.innerHTML = html;
+        }
+
+        // --- EXECUTION ---
+        async function callApi() {
+            if (!startPos || !endPos) { alert("Missing Start/End"); return; }
+            if (!pyodide) return;
+
+            const btn = document.getElementById('btn-run');
+            const spinner = document.getElementById('spinner');
+            btn.disabled = true; spinner.style.display = 'block';
+            termWrite("\n[System] Executing...\n", 'log-info');
+
+            try {
+                // Weights
+                let w1 = parseFloat(document.getElementById('w1').value);
+                let w2 = parseFloat(document.getElementById('w2').value);
+                let w3 = parseFloat(document.getElementById('w3').value);
+                let algo = document.getElementById('algo-select').value;
+                let walls = [];
+                for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) if (grid[y][x].type === 1) walls.push({ x, y });
+
+                // Payload
+                const payload = {
+                    grid_size: size, start: startPos, end: endPos,
+                    //walls: grid.flat().filter(c=>c.type===1).map(c=>({x:parseInt(c.div.dataset.x), y:parseInt(c.div.dataset.y)})),
+                    walls: walls,
+                    passengers: passengers,
+                    station_costs: grid.flat().filter(c => c.cost > 0).map(c => ({ x: parseInt(c.div.dataset.x), y: parseInt(c.div.dataset.y), cost: c.cost })),
+                    weights: { w1, w2, w3 },
+                    algo: algo
+                };
+
+                pyodide.globals.set("json_input", JSON.stringify(payload));
+
+                // Run Python
+                const wrapper = `
+import json
+try:
+    res = solve(json.loads(json_input))
+    json_out = json.dumps(res)
+except Exception as e:
+    print(f"Runtime Error: {e}")
+    json_out = json.dumps({"error": str(e)})
+`;
+                await pyodide.runPythonAsync(editor.getValue() + wrapper);
+
+                const res = JSON.parse(pyodide.globals.get("json_out"));
+                if (res.error) throw new Error(res.error);
+
+                drawResult(res.stations, res.route);
+                calculateCost(res.stations, res.route, w1, w2, w3);
+
+            } catch (e) {
+                termWrite(`Error: ${e.message}\n`, 'log-err');
+            } finally {
+                btn.disabled = false; spinner.style.display = 'none';
+            }
+        }
+
+        function drawResult(stations, route) {
+            grid.flat().forEach(c => {
+                if (c.div.classList.contains('station')) c.div.classList.remove('station');
+                if (c.div.classList.contains('route')) c.div.classList.remove('route');
+            });
+            stations.forEach(s => { if (!isProtected(s.x, s.y)) grid[s.y][s.x].div.classList.add('station'); });
+            route.forEach(r => { if (!isProtected(r.x, r.y)) grid[r.y][r.x].div.classList.add('route'); });
+        }
+
+        function calculateCost(stations, route, w1, w2, w3) {
+            let cR = route.length * w1;
+
+            // Station Cost = Fixed (w2) + Dynamic (grid cost)
+            let cS = 0;
+            stations.forEach(s => {
+                cS += w2;
+                if (grid[s.y] && grid[s.y][s.x]) {
+                    cS += (grid[s.y][s.x].cost || 0);
+                }
+            });
+
+            let totalWalk = 0;
+            let stops = [...stations, startPos, endPos];
+            passengers.forEach(p => {
+                let minD = Infinity;
+                stops.forEach(s => { let d = Math.hypot(p.x - s.x, p.y - s.y); if (d < minD) minD = d; });
+                totalWalk += (minD * p.count);
+            });
+            let cW = totalWalk * w3;
+            let total = cR + cS + cW;
+
+            document.getElementById('stats-content').innerHTML = `
+        <div class="stat-row"><span>Route Cost</span><span>${cR.toFixed(1)}</span></div>
+        <div class="stat-row"><span>Station Cost</span><span>${cS.toFixed(1)}</span></div>
+        <div class="stat-row"><span>Walk Cost</span><span>${cW.toFixed(1)}</span></div>
+        <div class="stat-row total"><span>TOTAL J</span><span>${total.toFixed(1)}</span></div>
+    `;
+        }
+
+        function updateLabels() {
+            ['w1', 'w2', 'w3'].forEach(id => document.getElementById('val-' + id).innerText = document.getElementById(id).value);
+        }
+
+        // Resizer
+        const resizer = document.getElementById('resizer');
+        const codePanel = document.getElementById('codePanel');
+        let isResizing = false;
+        resizer.addEventListener('mousedown', (e) => { isResizing = true; document.body.style.cursor = 'col-resize'; });
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            let w = window.innerWidth - e.clientX;
+            if (w > 300 && w < window.innerWidth * 0.8) codePanel.style.width = w + 'px';
+        });
+        document.addEventListener('mouseup', () => { isResizing = false; document.body.style.cursor = 'default'; editor.refresh(); });
+
+    </script>
+</body>
+
+</html>
