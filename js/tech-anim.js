@@ -94,7 +94,8 @@ const menuToggle = document.querySelector('.menu-toggle');
 const overlayMenu = document.querySelector('.overlay-menu');
 
 if (menuToggle && overlayMenu) {
-    menuToggle.addEventListener('click', () => {
+    menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent click from bubbling to document immediately
         overlayMenu.classList.toggle('active');
         // Animate hamburger lines
         const spans = menuToggle.querySelectorAll('span');
@@ -103,6 +104,17 @@ if (menuToggle && overlayMenu) {
             spans[1].style.opacity = '0';
             spans[2].style.transform = 'translate(0px, -9px) rotate(-45deg)';
         } else {
+            spans[0].style.transform = 'none';
+            spans[1].style.opacity = '1';
+            spans[2].style.transform = 'none';
+        }
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (overlayMenu.classList.contains('active') && !overlayMenu.contains(e.target)) {
+            overlayMenu.classList.remove('active');
+            const spans = menuToggle.querySelectorAll('span');
             spans[0].style.transform = 'none';
             spans[1].style.opacity = '1';
             spans[2].style.transform = 'none';
