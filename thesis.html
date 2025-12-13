@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Thesis | Pin-Wei "Champ" Chen</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Roboto+Mono:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/tech-design.css">
+</head>
+
+<body>
+    <canvas id="tech-canvas"></canvas>
+
+    <div class="content-wrapper">
+        <header>
+            <button class="menu-toggle" aria-label="Toggle Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="logo"><a href="index.html" style="color:var(--text-primary); text-decoration:none;">PC.</a>
+            </div>
+            <nav class="overlay-menu">
+                <ul>
+                    <li><a href="index.html">About</a></li>
+                    <li><a href="project.html">Projects</a></li>
+                    <li><a href="basketball.html">Basketball</a></li>
+                    <li><a href="band.html">Band</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section class="section" style="padding-top: 50px;">
+            <div class="section-title">
+                <span>//</span>
+                <h3>Master Thesis</h3>
+            </div>
+
+            <div class="thesis-container">
+                <h0
+                    style="color: var(--accent-cyan); font-family: var(--font-heading); display: block; margin-bottom: 10px;">
+                    Generative Adversarial Networks for Real-robot Missions</h0>
+
+                <h1>Information</h1>
+                <p>
+                    <strong>Author:</strong> Pin-Wei "David" Chen<br>
+                    <strong>Email:</strong> <a href="mailto:ccpwearth@gmail.com"
+                        style="color:var(--accent-cyan);">ccpwearth@gmail.com</a><br>
+                    <strong>Code:</strong> <a href="https://github.com/championway/gan_rv_thesis"
+                        style="color:var(--accent-cyan);" target="_blank">github.com/championway/gan_rv_thesis</a><br>
+                    <strong>Thesis:</strong> <a href="pdf/nctu_thesis_david.pdf" style="color:var(--accent-cyan);"
+                        target="_blank">PDF Download</a>
+                </p>
+
+                <h1>Abstract</h1>
+                <p>
+                    Leveraging highly developed deep learning and artificial intelligence, computer vision technology
+                    and applications reached new levels. Computers can now not only perform image processing,
+                    classification, and object detection, but also can ”create” images similarly to humans, due to
+                    generative model developments. In particular, the generative adversarial network (GAN) provides many
+                    architectures and applications, such as image style transfer, human face generation, image
+                    generation from text, etc. However, there has been little study regarding applying GAN to real-robot
+                    missions to replace and improve other approaches. Therefore, this work proposed two GANs:
+                    FCN-Pix2Pix and SSIM-CycleGAN, based on Pix2Pix and CycleGAN respectively, and implemented them for
+                    two real-robot missions which still face some challenges with modern solutions: semantic
+                    segmentation and virtual dataset from sim to real. The proposed approaches were also compared with
+                    current state-of-the-art approaches, verifying significant advantages for the proposed methods.
+                </p>
+
+                <h1>Network Architectures</h1>
+                <div class="thesis-img-grid">
+                    <div>
+                        <img src="thesis/Image/fcn_gan.jpg" alt="FCN GAN">
+                        <p style="text-align:center; font-size:0.8rem;">FCN-Pix2Pix Architecture</p>
+                    </div>
+                    <div>
+                        <img src="thesis/Image/SSIM-CycleGAN.jpg" alt="SSIM CycleGAN">
+                        <p style="text-align:center; font-size:0.8rem;">SSIM-CycleGAN Architecture</p>
+                    </div>
+                </div>
+
+                <h1>Experiments</h1>
+                <div class="thesis-img-grid">
+                    <img src="thesis/Image/ex1.png" alt="Experiment 1">
+                    <img src="thesis/Image/ex2.png" alt="Experiment 2">
+                </div>
+
+                <h1>Tote Sim2Real Dataset</h1>
+                <ul>
+                    <li><strong>Class</strong>: 2 (Real totes, Unity totes)</li>
+                    <li><strong>Image size</strong>: 640*480</li>
+                    <li><strong>Description</strong>:
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Real tote</strong>: Captured by SR300 from real world with different view
+                                angles.</li>
+                            <li><strong>Unity tote</strong>: Generated from virtual environment (Unity).</li>
+                            <li><strong>Image</strong>: Unity tote images with objects inside.</li>
+                            <li><strong>Mask</strong>: Labeled masks from Unity RGB images.</li>
+                        </ul>
+                    </li>
+                    <li><strong>CSV Description</strong>:
+                        <ul style="margin-left: 20px;">
+                            <li><strong>menu.csv</strong>: Mapping between Unity image, mask, and Unity tote image.</li>
+                            <li><strong>real_totes_train/test.csv</strong>: Lists for real totes.</li>
+                            <li><strong>unity_totes_train/test.csv</strong>: Lists for Unity totes.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Dataset</th>
+                            <th>Size</th>
+                            <th>Image</th>
+                            <th>Real totes</th>
+                            <th>Unity totes</th>
+                            <th>Download</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Tote Sim2Real Sample</td>
+                            <td>25.9MB</td>
+                            <td>100</td>
+                            <td>100</td>
+                            <td>99</td>
+                            <td><a href="https://drive.google.com/open?id=1K8OyugZ_LuVETUveS2hBEwT8ffotn5jq"
+                                    style="color:var(--accent-cyan);">sim2real_sample.zip</a></td>
+                        </tr>
+                        <tr>
+                            <td>Tote Sim2Real</td>
+                            <td>19.8GB</td>
+                            <td>68608</td>
+                            <td>5690</td>
+                            <td>9472</td>
+                            <td><a href="https://drive.google.com/open?id=1Ylb2aHAvpTKEC0UktbZNYotTZbRH7ZbS"
+                                    style="color:var(--accent-cyan);">sim2real.zip</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h1 style="margin-top: 50px;">Full Thesis PDF</h1>
+                <embed src="pdf/nctu_thesis_david.pdf" type="application/pdf" class="thesis-iframe" />
+
+            </div>
+
+            <footer style="margin-top: 50px; text-align: center;">
+                <p>Designed & Built by Pin-Wei Chen</p>
+            </footer>
+        </section>
+    </div>
+
+    <script src="js/tech-anim.js"></script>
+</body>
+
+</html>
